@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.35229.62
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "WeatherDataHub", "WeatherDataHub\WeatherDataHub.pyproj", "{7B0DB552-9D88-41DC-822D-D0E06FA42E46}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7B0DB552-9D88-41DC-822D-D0E06FA42E46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B0DB552-9D88-41DC-822D-D0E06FA42E46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A66B7CAF-414C-4508-9C79-C2300A0600FC}
+	EndGlobalSection
+EndGlobal
