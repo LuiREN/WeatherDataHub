@@ -44,6 +44,9 @@
     <InterpreterReference Include="Global|PythonCore|3.11" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="requirements.txt">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="styles.qss">
       <SubType>Code</SubType>
     </Content>
