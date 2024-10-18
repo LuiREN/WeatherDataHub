@@ -22,6 +22,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="annotation.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="dataset_creator.py">
       <SubType>Code</SubType>
     </Compile>
