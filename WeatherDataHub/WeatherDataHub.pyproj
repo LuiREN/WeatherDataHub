@@ -35,6 +35,9 @@
     <Compile Include="data_viewer.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="date_widget.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="main.py" />
     <Compile Include="optimized_table.py">
       <SubType>Code</SubType>
