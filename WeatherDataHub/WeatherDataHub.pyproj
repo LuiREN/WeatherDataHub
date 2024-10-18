@@ -25,16 +25,10 @@
     <Compile Include="annotation.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="dataset_creator.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="data_preprocessing.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="data_retrieval.py" />
-    <Compile Include="data_viewer.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="date_widget.py">
       <SubType>Code</SubType>
     </Compile>
