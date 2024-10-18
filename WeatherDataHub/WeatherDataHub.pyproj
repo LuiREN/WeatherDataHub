@@ -37,8 +37,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="scraper.py" />
-    <Compile Include="split_by_week.py" />
-    <Compile Include="split_by_year.py" />
     <Compile Include="split_csv.py" />
     <Compile Include="main_window.py" />
   </ItemGroup>

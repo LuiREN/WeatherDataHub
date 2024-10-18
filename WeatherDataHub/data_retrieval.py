@@ -67,6 +67,7 @@ def get_data_by_date_weekly(date: date, folder: str) -> Optional[Dict[str, str]]
     print(f"Данные для даты {format_date(date)} не найдены.")
     return None
 
+
 class WeatherIterator:
     """Итератор для перебора данных о погоде."""
 

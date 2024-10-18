@@ -11,9 +11,7 @@ from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from PyQt6.QtGui import QFont
 from data_preprocessing import preprocess_data
 from scraper import WeatherScraper
-from split_by_week import split_by_week
-from split_by_year import split_by_year
-from split_csv import split_csv
+from split_csv import split_csv,split_by_year,split_by_week
 from optimized_table import OptimizedTableWidget
 from annotation import create_annotation_file, read_annotation_file
 from date_widget import DateDataWidget

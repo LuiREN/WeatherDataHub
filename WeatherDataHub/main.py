@@ -2,9 +2,7 @@ import os
 from typing import Optional, Tuple
 from datetime import datetime
 from scraper import WeatherScraper
-from split_csv import split_csv
-from split_by_year import split_by_year
-from split_by_week import split_by_week
+from split_csv import split_csv,split_by_year,split_by_week
 from data_retrieval import (
     get_data_by_date_original,
     get_data_by_date_split,
@@ -12,8 +10,6 @@ from data_retrieval import (
     get_data_by_date_weekly,
     WeatherIterator
 )
-
-
 def get_csv_file(folder: str = 'dataset') -> Optional[str]:
     """Запрашивает у пользователя выбор CSV файла из указанной папки."""
     if not os.path.exists(folder):
