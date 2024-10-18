@@ -12,7 +12,7 @@ def create_annotation_file(file_path, output_path):
         writer.writerow(["Количество столбцов", len(df.columns)])
         writer.writerow(["Начальная дата", df['Дата'].min()])
         writer.writerow(["Конечная дата", df['Дата'].max()])
-        writer.writerow(["Информация о столбцах", ""])
+      
         
         for col in df.columns:
             writer.writerow([
