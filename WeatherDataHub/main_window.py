@@ -6,8 +6,6 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout,
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from PyQt6.QtGui import QFont
 from data_preprocessing import preprocess_data
-from data_viewer import show_data_preview
-from dataset_creator import show_dataset_creator_dialog
 from scraper import WeatherScraper
 from split_by_week import split_by_week
 from split_by_year import split_by_year
@@ -47,14 +45,8 @@ class MainWindow(QMainWindow):
         self.preprocess_button = self.create_button("Предобработка данных", self.preprocess_data)
         left_panel.addWidget(self.preprocess_button)
         
-        self.preview_button = self.create_button("Предварительный просмотр", self.show_preview)
-        left_panel.addWidget(self.preview_button)
-        
-        self.create_dataset_button = self.create_button("Создать новый датасет", self.show_dataset_creator)
+        self.create_dataset_button = self.create_button("Создать новый датасет", self.show_scraper_dialog)
         left_panel.addWidget(self.create_dataset_button)
-        
-        self.scrape_data_button = self.create_button("Собрать данные с сайта", self.show_scraper_dialog)
-        left_panel.addWidget(self.scrape_data_button)
         
         self.split_by_week_button = self.create_button("Разделить по неделям", self.split_by_week)
         left_panel.addWidget(self.split_by_week_button)
@@ -110,13 +102,13 @@ class MainWindow(QMainWindow):
         if file_path:
             self.current_file = file_path
             self.info_label.setText(f"Выбран файл: {self.current_file}")
-            self.show_preview()
+            self.show_preview(self.current_file)
 
     def preprocess_data(self):
         if self.current_file:
             self.preprocessed_data = preprocess_data(self.current_file)
             self.info_label.setText("Данные предобработаны")
-            self.show_data_in_table(self.preprocessed_data)
+            self.show_preview(self.preprocessed_data)
             # Сохранение предобработанных данных
             save_path, _ = QFileDialog.getSaveFileName(self, "Сохранить предобработанные данные", "", "CSV Files (*.csv)")
             if save_path:
@@ -125,14 +117,11 @@ class MainWindow(QMainWindow):
         else:
             self.info_label.setText("Сначала выберите файл")
 
-    def show_preview(self):
-        if self.current_file:
-            df = pd.read_csv(self.current_file)
-            self.show_data_in_table(df)
+    def show_preview(self, data):
+        if isinstance(data, str):
+            df = pd.read_csv(data)
         else:
-            self.info_label.setText("Сначала выберите файл")
-
-    def show_data_in_table(self, df):
+            df = data
         self.data_preview.setColumnCount(len(df.columns))
         self.data_preview.setRowCount(len(df))
         self.data_preview.setHorizontalHeaderLabels(df.columns)
@@ -140,9 +129,6 @@ class MainWindow(QMainWindow):
             for j in range(len(df.columns)):
                 self.data_preview.setItem(i, j, QTableWidgetItem(str(df.iloc[i, j])))
         self.data_preview.resizeColumnsToContents()
-
-    def show_dataset_creator(self):
-        show_dataset_creator_dialog(self)
 
     def show_scraper_dialog(self):
         dialog = QWidget()
@@ -208,31 +194,32 @@ class MainWindow(QMainWindow):
 
     def scraping_finished(self, filename):
         if filename:
-            QMessageBox.information(self, "Сбор данных завершен", f"Данные сохранены в файл: {filename}")
+            full_path = os.path.join(os.getcwd(), 'dataset', filename)
+            QMessageBox.information(self, "Сбор данных завершен", f"Данные сохранены в файл:\n{full_path}")
             self.scraper_dialog.close()
-            self.current_file = os.path.join('dataset', filename)
-            self.show_preview()
+            self.current_file = full_path
+            self.show_preview(self.current_file)
         else:
             QMessageBox.warning(self, "Ошибка", "Не удалось собрать данные. Проверьте подключение к интернету и попробуйте снова.")
 
     def split_by_week(self):
         if self.current_file:
-            split_by_week(self.current_file)
-            self.info_label.setText("Данные разделены по неделям")
+            output_folder = split_by_week(self.current_file)
+            self.info_label.setText(f"Данные разделены по неделям. Результаты сохранены в {output_folder}")
         else:
             self.info_label.setText("Сначала выберите файл")
 
     def split_by_year(self):
         if self.current_file:
-            split_by_year(self.current_file)
-            self.info_label.setText("Данные разделены по годам")
+            output_folder = split_by_year(self.current_file)
+            self.info_label.setText(f"Данные разделены по годам. Результаты сохранены в {output_folder}")
         else:
             self.info_label.setText("Сначала выберите файл")
 
     def split_csv(self):
         if self.current_file:
-            split_csv(self.current_file)
-            self.info_label.setText("Данные разделены на X и Y")
+            output_folder = split_csv(self.current_file)
+            self.info_label.setText(f"Данные разделены на X и Y. Результаты сохранены в {output_folder}")
         else:
             self.info_label.setText("Сначала выберите файл")
 

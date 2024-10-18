@@ -33,6 +33,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="main.py" />
+    <Compile Include="optimized_table.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="scraper.py" />
     <Compile Include="split_by_week.py" />
     <Compile Include="split_by_year.py" />
