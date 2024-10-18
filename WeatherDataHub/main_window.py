@@ -123,13 +123,13 @@ class MainWindow(QMainWindow):
         if file_path:
             self.current_file = file_path
             self.info_label.setText(f"Выбран файл: {self.current_file}")
-            self.show_preview(self.current_file)
+            self.load_data(self.current_file)
 
     def preprocess_data(self):
         if self.current_file:
             self.preprocessed_data = preprocess_data(self.current_file)
             self.info_label.setText("Данные предобработаны")
-            self.show_preview(self.preprocessed_data)
+            self.load_data(self.preprocessed_data)
             # Сохранение предобработанных данных
             save_path, _ = QFileDialog.getSaveFileName(self, "Сохранить предобработанные данные", "", "CSV Files (*.csv)")
             if save_path:
@@ -137,6 +137,22 @@ class MainWindow(QMainWindow):
                 self.info_label.setText(f"Предобработанные данные сохранены в {save_path}")
         else:
             self.info_label.setText("Сначала выберите файл")
+
+    def load_data(self, data):
+        if isinstance(data, str):
+            try:
+                df = pd.read_csv(data)
+            except Exception as e:
+                self.info_label.setText(f"Ошибка при чтении файла: {str(e)}")
+                return
+        elif isinstance(data, pd.DataFrame):
+            df = data
+        else:
+            self.info_label.setText("Неподдерживаемый тип данных")
+            return
+
+        self.data_preview.load_data(df)
+
 
     def create_annotation(self):
         if self.current_file:
@@ -150,7 +166,7 @@ class MainWindow(QMainWindow):
     def show_annotation(self, annotation_file):
         try:
             annotation_data = read_annotation_file(annotation_file)
-            self.show_preview(annotation_data)
+            self.load_data(annotation_data)
             self.info_label.setText("Просмотр аннотации")
         except Exception as e:
             self.info_label.setText(f"Ошибка при чтении файла аннотации: {str(e)}")
@@ -166,17 +182,17 @@ class MainWindow(QMainWindow):
                 
                 if input_date < df['Дата'].min() or input_date > df['Дата'].max():
                     self.info_label.setText(f"Дата {date_str} находится вне диапазона данных ({df['Дата'].min().date()} - {df['Дата'].max().date()})")
+                    self.data_preview.clear()
                     return
 
                 data = df[df['Дата'] == input_date]
                 
                 if not data.empty:
-                    self.show_preview(data)
-                    info_text = f"Данные на {date_str}"
-                    self.info_label.setText(info_text)
+                    self.load_data(data)
+                    self.info_label.setText(f"Данные на {date_str}")
                 else:
                     self.info_label.setText(f"Нет данных на {date_str}")
-                    self.show_preview(pd.DataFrame())  # Очищаем предпросмотр
+                    self.data_preview.clear()
                 
             except ValueError as e:
                 self.info_label.setText(f"Ошибка в формате даты: {str(e)}. Используйте формат ГГГГ-ММ-ДД")
