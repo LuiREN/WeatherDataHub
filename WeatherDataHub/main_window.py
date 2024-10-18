@@ -2,7 +2,11 @@ import sys
 import os
 import pandas as pd
 from datetime import datetime
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QHBoxLayout, QWidget, QFileDialog, QTableWidget, QTableWidgetItem, QLabel, QFrame, QLineEdit, QProgressBar, QMessageBox
+from PyQt6.QtWidgets import (
+    QApplication, QMainWindow, QPushButton, QVBoxLayout, QHBoxLayout, 
+    QWidget, QFileDialog, QLabel, QFrame, QProgressBar, QMessageBox, 
+    QTableWidgetItem,QLineEdit
+)
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from PyQt6.QtGui import QFont
 from data_preprocessing import preprocess_data
@@ -10,6 +14,9 @@ from scraper import WeatherScraper
 from split_by_week import split_by_week
 from split_by_year import split_by_year
 from split_csv import split_csv
+from optimized_table import OptimizedTableWidget
+from annotation import create_annotation_file, read_annotation_file
+from date_widget import DateDataWidget
 
 class ScraperThread(QThread):
     update_progress = pyqtSignal(int)
@@ -30,7 +37,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("WeatherDataHub")
-        self.setGeometry(100, 100, 1000, 600)
+        self.setGeometry(100, 100, 1200, 800)
 
         central_widget = QWidget()
         main_layout = QHBoxLayout()
@@ -39,23 +46,28 @@ class MainWindow(QMainWindow):
         left_panel = QVBoxLayout()
         left_panel.setAlignment(Qt.AlignmentFlag.AlignTop)
         
-        self.select_file_button = self.create_button("Выбрать файл", self.select_file)
+        button_width = 220  # Увеличенная ширина кнопок
+        
+        self.select_file_button = self.create_button("Выбрать файл", self.select_file, button_width)
         left_panel.addWidget(self.select_file_button)
         
-        self.preprocess_button = self.create_button("Предобработка данных", self.preprocess_data)
+        self.preprocess_button = self.create_button("Предобработка данных", self.preprocess_data, button_width)
         left_panel.addWidget(self.preprocess_button)
         
-        self.create_dataset_button = self.create_button("Создать новый датасет", self.show_scraper_dialog)
+        self.create_dataset_button = self.create_button("Создать новый датасет", self.show_scraper_dialog, button_width)
         left_panel.addWidget(self.create_dataset_button)
         
-        self.split_by_week_button = self.create_button("Разделить по неделям", self.split_by_week)
+        self.split_by_week_button = self.create_button("Разделить по неделям", self.split_by_week, button_width)
         left_panel.addWidget(self.split_by_week_button)
         
-        self.split_by_year_button = self.create_button("Разделить по годам", self.split_by_year)
+        self.split_by_year_button = self.create_button("Разделить по годам", self.split_by_year, button_width)
         left_panel.addWidget(self.split_by_year_button)
         
-        self.split_csv_button = self.create_button("Разделить на X и Y", self.split_csv)
+        self.split_csv_button = self.create_button("Разделить на X и Y", self.split_csv, button_width)
         left_panel.addWidget(self.split_csv_button)
+        
+        self.create_annotation_button = self.create_button("Создать аннотацию", self.create_annotation, button_width)
+        left_panel.addWidget(self.create_annotation_button)
 
         # Правая панель для отображения информации
         right_panel = QVBoxLayout()
@@ -64,13 +76,21 @@ class MainWindow(QMainWindow):
         self.info_label.setFont(QFont("Arial", 12))
         right_panel.addWidget(self.info_label)
         
-        self.data_preview = QTableWidget()
+        self.data_preview = OptimizedTableWidget()
         right_panel.addWidget(self.data_preview)
+        
+        self.date_input = QLineEdit()
+        self.date_input.setPlaceholderText("ГГГГ-ММ-ДД")
+        right_panel.addWidget(self.date_input)
+        
+        self.get_data_button = QPushButton("Получить данные")
+        self.get_data_button.clicked.connect(self.get_data_for_date)
+        right_panel.addWidget(self.get_data_button)
 
         # Добавляем панели в главный layout
         left_panel_widget = QWidget()
         left_panel_widget.setLayout(left_panel)
-        left_panel_widget.setFixedWidth(200)
+        left_panel_widget.setFixedWidth(240)  # Немного увеличиваем ширину левой панели
         
         right_panel_widget = QWidget()
         right_panel_widget.setLayout(right_panel)
@@ -87,9 +107,10 @@ class MainWindow(QMainWindow):
         # Загрузка стилей
         self.load_styles()
 
-    def create_button(self, text, callback):
+    def create_button(self, text, callback, width):
         button = QPushButton(text)
         button.clicked.connect(callback)
+        button.setFixedWidth(width)
         return button
 
     def load_styles(self):
@@ -117,18 +138,67 @@ class MainWindow(QMainWindow):
         else:
             self.info_label.setText("Сначала выберите файл")
 
-    def show_preview(self, data):
-        if isinstance(data, str):
-            df = pd.read_csv(data)
+    def create_annotation(self):
+        if self.current_file:
+            output_path = self.current_file.rsplit('.', 1)[0] + '_annotation.csv'
+            create_annotation_file(self.current_file, output_path)
+            self.info_label.setText(f"Файл аннотации создан: {output_path}")
+            self.show_annotation(output_path)
         else:
-            df = data
-        self.data_preview.setColumnCount(len(df.columns))
-        self.data_preview.setRowCount(len(df))
-        self.data_preview.setHorizontalHeaderLabels(df.columns)
-        for i in range(len(df)):
-            for j in range(len(df.columns)):
-                self.data_preview.setItem(i, j, QTableWidgetItem(str(df.iloc[i, j])))
-        self.data_preview.resizeColumnsToContents()
+            self.info_label.setText("Сначала выберите файл")
+
+    def show_annotation(self, annotation_file):
+        try:
+            annotation_data = read_annotation_file(annotation_file)
+            self.show_preview(annotation_data)
+            self.info_label.setText("Просмотр аннотации")
+        except Exception as e:
+            self.info_label.setText(f"Ошибка при чтении файла аннотации: {str(e)}")
+            print(f"Ошибка при чтении файла аннотации: {str(e)}")
+
+    def get_data_for_date(self):
+        if self.current_file:
+            date_str = self.date_input.text()
+            try:
+                input_date = pd.to_datetime(date_str).normalize()
+                df = pd.read_csv(self.current_file, parse_dates=['Дата'])
+                df['Дата'] = pd.to_datetime(df['Дата']).dt.normalize()
+                
+                if input_date < df['Дата'].min() or input_date > df['Дата'].max():
+                    self.info_label.setText(f"Дата {date_str} находится вне диапазона данных ({df['Дата'].min().date()} - {df['Дата'].max().date()})")
+                    return
+
+                data = df[df['Дата'] == input_date]
+                
+                if not data.empty:
+                    self.show_preview(data)
+                    info_text = f"Данные на {date_str}"
+                    self.info_label.setText(info_text)
+                else:
+                    self.info_label.setText(f"Нет данных на {date_str}")
+                    self.show_preview(pd.DataFrame())  # Очищаем предпросмотр
+                
+            except ValueError as e:
+                self.info_label.setText(f"Ошибка в формате даты: {str(e)}. Используйте формат ГГГГ-ММ-ДД")
+            except Exception as e:
+                self.info_label.setText(f"Ошибка при получении данных: {str(e)}")
+        else:
+            self.info_label.setText("Сначала выберите файл")
+
+    def show_preview(self, data):
+        if isinstance(data, pd.DataFrame):
+            if not data.empty:
+                self.data_preview.load_data(data)
+            else:
+                self.data_preview.clear()
+        elif isinstance(data, str):
+            try:
+                df = pd.read_csv(data)
+                self.show_preview(df)
+            except Exception as e:
+                self.info_label.setText(f"Ошибка при чтении файла: {str(e)}")
+        else:
+            self.info_label.setText("Неподдерживаемый тип данных для предпросмотра")
 
     def show_scraper_dialog(self):
         dialog = QWidget()
