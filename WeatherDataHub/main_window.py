@@ -285,7 +285,7 @@ class MainWindow(QMainWindow):
             QMessageBox.information(self, "Сбор данных завершен", f"Данные сохранены в файл:\n{full_path}")
             self.scraper_dialog.close()
             self.current_file = full_path
-            self.show_preview(self.current_file)
+            self.load_data(self.current_file)  
         else:
             QMessageBox.warning(self, "Ошибка", "Не удалось собрать данные. Проверьте подключение к интернету и попробуйте снова.")
 

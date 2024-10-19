@@ -3,55 +3,45 @@ QMainWindow {
 }
 
 QPushButton {
-    background-color: #6a9eda;
-    border: none;
+    background-color: #8A2BE2; /* Фиалковый цвет */
     color: white;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
+    padding: 8px 16px;
     font-size: 14px;
-    margin: 4px 2px;
-    border-radius: 20px;
-    width: 180px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    border: none;
+    border-radius: 10px;
+    min-width: 180px;
+    font-family: "Deledda", Arial, sans-serif;
 }
 
 QPushButton:hover {
-    background-color: #5a8ec9;
+    background-color: #9932CC; /* Немного светлее при наведении */
 }
 
 QTableWidget {
     background-color: white;
     gridline-color: #e0e0e0;
     border: 1px solid #e0e0e0;
-    border-radius: 8px;
 }
 
-QTableWidget QHeaderView::section {
+QHeaderView::section {
     background-color: #f0f0f0;
     padding: 4px;
     border: 1px solid #e0e0e0;
     font-weight: bold;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: "Deledda", Arial, sans-serif;
 }
 
 QLabel {
     color: #444;
     font-size: 14px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-QFrame {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background-color: white;
+    font-family: "Deledda", Arial, sans-serif;
 }
 
 QLineEdit {
     border: 1px solid #c0c0c0;
     border-radius: 4px;
     padding: 5px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: "Deledda", Arial, sans-serif;
 }
 
 QProgressBar {
@@ -61,7 +51,5 @@ QProgressBar {
 }
 
 QProgressBar::chunk {
-    background-color: #6a9eda;
-    width: 10px;
-    margin: 0.5px;
+    background-color: #8A2BE2; /* Фиалковый цвет */
 }
